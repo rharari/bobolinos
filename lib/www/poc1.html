@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!-- just a poc -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bobolinos</title>
+</head>
+<body>
+<canvas id="board" width="640" height="480"></canvas>
+<br>
+Id Avatar [0,7] -> <input type="number" id="idAvatar" name="idAvatar" onkeyup="javascript:changeAvatar()" maxlength="1">
+Nick -> <input type="text" name="nome" id="nome" onkeyup="javascript:changeName()" maxlength="10">
+Velocity [1,5] -> <input type="number" id="idVelocity" name="idVelocity" onkeyup="javascript:changeVelocity()" maxlength="1">
+<button onmouseenter="activate(1)" onmouseleave="deactivate(1)">LEFT</button>
+<button onmouseenter="activate(2)" onmouseleave="deactivate(2)">RIGHT</button>
+<button onmouseenter="activate(3)" onmouseleave="deactivate(0)">UP</button>
+<button onmouseenter="activate(0)" onmouseleave="deactivate(3)">DOWN</button>
+
+<br>
+</body>
+
+<script language = "javascript">
+var bobolinos = new Image();
+
+var currAction = -1;
+var idAvatar = 0;
+var step = 0; // 0,1,2
+var direction = 0; // 0 - down, 1-left, 2-right, 3-up
+var x = 250;
+var y = 100;
+var name = "bobolino";
+var velocity = 3;
+
+
+function activate(id) {
+    currAction = id;
+    direction = id;
+    step = 0;
+}
+function deactivate(id) {
+    currAction = -1;
+}
+
+function init(){
+  bobolinos.src = 'bobolitos_3.png';
+  window.requestAnimationFrame(draw);
+}
+
+var ctx = document.getElementById('board').getContext('2d');
+ctx.globalCompositeOperation = 'destination-over';
+
+ctx.font = "11px Arial";
+
+function changeName() {
+    var a = document.getElementById('nome').value;
+    if (a.length > 0 && a.length < 11) {
+        name = a;
+    } else {
+        name = "bobolino";
+    }
+}
+
+function changeAvatar() {
+  var a = document.getElementById('idAvatar').value;
+  if (a >= 0 && a < 8) idAvatar = a;
+}
+function changeVelocity() {
+  var a = document.getElementById('idVelocity').value;
+  if (a >= 1 && a < 6) velocity = parseInt(a);
+}
+
+function draw() {
+
+  ctx.clearRect(0,0,640,480); // clear canvas
+  ctx.save();
+  if (idAvatar < 4) {
+      var xcrop = 48 * (idAvatar * 3 + step);
+      var ycrop = direction * 48;
+  } else {
+      var xcrop = 48 * ((idAvatar - 4) * 3 + step);
+      var ycrop = (direction + 4) * 48;
+  }
+
+  ctx.fillText(name,x + 22 - name.length * 2,y - 5);
+
+  ctx.drawImage(bobolinos,  xcrop, ycrop,  48, 48, x, y, 48, 48); // down
+
+  if (currAction > -1) {
+    if (currAction == 0) y = y + velocity;
+    if (currAction == 3) y = y - velocity;
+    if (currAction == 1) x = x - velocity;
+    if (currAction == 2) x = x + velocity;
+    step++;
+  }
+  if (step == 3) step = 0;
+
+  // boundaries
+  if (x < 0) x = 0;
+  if (x > 600) x = 600;
+  if (y < 5) y = 5;
+  if (y > 440) y = 440;
+
+}
+
+init();
+setInterval(draw,50);
+</script>
+
+</html>
